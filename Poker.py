@@ -72,6 +72,27 @@ for turn, river in itertools.combinations(remaining_cards, 2):
 odds_of_pair = (pair_combinations/total_combinations)*100
 odds_of_threeofkind = (threeofakind_combinations/total_combinations)*100
 
+#Odds of two pair
+def has_twopair(cards):
+    ranks = []
+    for card in cards:
+        ranks.append(card[1:])
+    pair_count = 0
+    for rank in set(ranks):
+        if ranks.count(rank) >= 2:
+            pair_count += 1
+    if pair_count >= 2:
+        return True
+    return False
+total_combinations = 0
+twopair_combinations = 0
+for turn, river in itertools.combinations(remaining_cards, 2):
+    total_combinations += 1
+    final_cards = known_cards + [turn, river]
+    if has_twopair(final_cards):
+        twopair_combinations += 1
+odds_of_twopair = (twopair_combinations / total_combinations) * 100
+
 #Odds of straights
 def has_straight(cards):
     ranks1 = []
@@ -150,8 +171,96 @@ for turn, river in itertools.combinations(remaining_cards, 2):
         fullhouse_combinations += 1
 odds_of_fullhouse = (fullhouse_combinations / total_combinations) * 100
 
+#Odds of four of a kind
+def has_fourofkind(cards):
+    ranks=[]
+    for card in cards:
+        ranks.append(card[1:])
+    for rank in set(ranks):
+        if ranks.count(rank) >= 4:
+            return True
+    return False
+total_combinations=0
+fourofkind_combinations=0
+for turn, river in itertools.combinations(remaining_cards,2):
+    total_combinations+=1
+    final_cards = known_cards + [turn, river]
+    if has_fourofkind(final_cards):
+        fourofkind_combinations+=1
+odds_of_fourofakind = (fourofkind_combinations/total_combinations)*100
+
+#Odds of straight flush
+def has_straightflush(cards):
+    suits = ["D", "S", "H", "C"]
+    for suit in suits:
+        suited_cards = []
+        for card in cards:
+            if card[0] == suit:
+                suited_cards.append(card)
+        if len(suited_cards) <5:
+            continue
+        ranks = []
+        for card in suited_cards:
+            rank=card[1:]
+            if rank == "A":
+                value = 14
+            elif rank == "K":
+                value = 13
+            elif rank == "Q":
+                value = 12
+            elif rank == "J":
+                value = 11
+            else: 
+                value = int(rank)
+            ranks.append(value)
+        ranks = list(set(ranks))
+        if 14 in ranks: 
+            ranks.append(1)
+        ranks.sort()
+        for i in range(len(ranks) -4):
+            if (ranks[i+1] == ranks[i] +1 and
+                ranks[i+2] == ranks[i] +2 and
+                ranks[i+3] == ranks[i] +3 and
+                ranks[i+4] == ranks[i] +4):
+                return True
+    return False
+total_combinations=0
+sflush_combinations=0
+for turn, river in itertools.combinations(remaining_cards, 2):
+    total_combinations+=1
+    final_cards = known_cards + [turn, river]
+    if has_straightflush(final_cards):
+        sflush_combinations+=1
+odds_of_sflush = (sflush_combinations/total_combinations)*100
+
+#Odds of royal flush
+def has_royalflush(cards):
+    suits = ["D", "S", "H", "C"]
+    for suit in suits:
+        needed_cards = [
+            suit + "10",
+            suit + "J",
+            suit + "Q",
+            suit + "K",
+            suit + "A"]
+        if all(card in cards for card in needed_cards):
+            return True
+    return False
+total_combinations = 0
+rflush_combinations = 0
+for turn, river in itertools.combinations(remaining_cards, 2):
+    total_combinations += 1
+    final_cards = known_cards + [turn, river]
+    if has_royalflush(final_cards):
+        rflush_combinations += 1
+odds_of_rflush = (rflush_combinations / total_combinations) * 100
+
 print("odds of pair:", round(odds_of_pair,2),"%")
+print("odds of two pair:", round(odds_of_twopair,2), "%")
 print("odds of three of a kind:", round(odds_of_threeofkind,2),"%")
 print("odds of straight:", round(odds_of_straight,2),"%")
 print("odds of flush:", round(odds_of_flush,2),"%")
 print("odds of fullhouse:", round(odds_of_fullhouse,2),"%")
+print("odds of four of a kind:", round(odds_of_fourofakind,2), "%")
+print("odds of straight flush:", round(odds_of_sflush),"%")
+print("odds of royal flush:", round(odds_of_rflush,2), "%")
