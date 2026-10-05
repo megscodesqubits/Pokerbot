@@ -1,4 +1,6 @@
 import itertools
+from collections import Counter
+import random
 
 all_cards = ["DA", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "DJ", "DQ", "DK", 
              "SA", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "SJ", "SQ", "SK", 
@@ -7,7 +9,7 @@ all_cards = ["DA", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "DJ", 
 
 odds_of_pair=0
 odds_of_twopair=0
-odds_of_threeofkind=0
+odds_of_threeofakind=0
 odds_of_straight=0
 odds_of_flush=0
 odds_of_fullhouse=0
@@ -50,7 +52,7 @@ def has_pair(cards):
         if ranks.count(rank) >=2:
             return True
     return False
-def has_threeofkind(cards):
+def has_threeofakind(cards):
     ranks = []
     for card in cards:
         ranks.append(card[1:])
@@ -67,10 +69,10 @@ for turn, river in itertools.combinations(remaining_cards, 2):
     final_cards = known_cards + [turn, river]
     if has_pair(final_cards):
         pair_combinations +=1
-    if has_threeofkind(final_cards):
+    if has_threeofakind(final_cards):
         threeofakind_combinations+=1
 odds_of_pair = (pair_combinations/total_combinations)*100
-odds_of_threeofkind = (threeofakind_combinations/total_combinations)*100
+odds_of_threeofakind = (threeofakind_combinations/total_combinations)*100
 
 #Odds of two pair
 def has_twopair(cards):
@@ -258,12 +260,12 @@ odds_of_rflush = (rflush_combinations / total_combinations) * 100
 print("")
 print("odds of pair:", round(odds_of_pair,2),"%")
 print("odds of two pair:", round(odds_of_twopair,2), "%")
-print("odds of three of a kind:", round(odds_of_threeofkind,2),"%")
+print("odds of three of a kind:", round(odds_of_threeofakind,2),"%")
 print("odds of straight:", round(odds_of_straight,2),"%")
 print("odds of flush:", round(odds_of_flush,2),"%")
 print("odds of fullhouse:", round(odds_of_fullhouse,2),"%")
 print("odds of four of a kind:", round(odds_of_fourofakind,2), "%")
-print("odds of straight flush:", round(odds_of_sflush),"%")
+print("odds of straight flush:", round(odds_of_sflush,2),"%")
 print("odds of royal flush:", round(odds_of_rflush,2), "%")
 
 tcard4 = input("Input the fourth card on the table:")
@@ -282,29 +284,29 @@ rflush_combinations=0
 
 for river in all_cards:
     total_combinations +=1
-    final_cards = known_cards + [river, turn]
+    final_cards = known_cards + [river]
     if has_pair(final_cards):
         pair_combinations+=1
-    elif has_twopair(final_cards):
+    if has_twopair(final_cards):
         twopair_combinations+=1
-    elif has_threeofkind(final_cards):
+    if has_threeofakind(final_cards):
         threeofakind_combinations+=1
-    elif has_straight(final_cards):
+    if has_straight(final_cards):
         straight_combinations+=1
-    elif has_flush(final_cards):
+    if has_flush(final_cards):
         flush_combinations+=1
-    elif has_fullhouse(final_cards):
+    if has_fullhouse(final_cards):
         fullhouse_combinations+=1
-    elif has_fourofakind(final_cards):
+    if has_fourofakind(final_cards):
         fourofakind_combinations+=1
-    elif has_straightflush(final_cards):
+    if has_straightflush(final_cards):
         sflush_combinations+=1
-    elif has_royalflush(final_cards):
+    if has_royalflush(final_cards):
         rflush_combinations+=1
 
 odds_of_pair = (pair_combinations / total_combinations) * 100
 odds_of_twopair = (twopair_combinations / total_combinations) * 100
-odds_of_threeofkind = (threeofakind_combinations / total_combinations) * 100
+odds_of_threeofakind = (threeofakind_combinations / total_combinations) * 100
 odds_of_straight = (straight_combinations / total_combinations) * 100
 odds_of_flush = (flush_combinations / total_combinations) * 100
 odds_of_fullhouse = (fullhouse_combinations / total_combinations) * 100
@@ -314,66 +316,33 @@ odds_of_rflush = (rflush_combinations / total_combinations) * 100
 print("")
 print("odds of pair:", round(odds_of_pair,2),"%")
 print("odds of two pair:", round(odds_of_twopair,2), "%")
-print("odds of three of a kind:", round(odds_of_threeofkind,2),"%")
+print("odds of three of a kind:", round(odds_of_threeofakind,2),"%")
 print("odds of straight:", round(odds_of_straight,2),"%")
 print("odds of flush:", round(odds_of_flush,2),"%")
 print("odds of fullhouse:", round(odds_of_fullhouse,2),"%")
 print("odds of four of a kind:", round(odds_of_fourofakind,2), "%")
-print("odds of straight flush:", round(odds_of_sflush),"%")
+print("odds of straight flush:", round(odds_of_sflush,2),"%")
 print("odds of royal flush:", round(odds_of_rflush,2), "%")
 
 tcard5 = input("Input the fifth card on the table:")
 all_cards.remove(tcard5)
 known_cards.append(tcard5)
-total_combinations=0
-pair_combinations=0
-twopair_combinations=0
-threeofakind_combinations=0
-straight_combinations=0
-flush_combinations=0
-fullhouse_combinations=0
-fourofakind_combinations=0
-sflush_combinations=0
-rflush_combinations=0
-
-for river in all_cards:
-    total_combinations +=1
-    final_cards = known_cards + [river, turn]
-    if has_pair(final_cards):
-        pair_combinations+=1
-    elif has_twopair(final_cards):
-        twopair_combinations+=1
-    elif has_threeofkind(final_cards):
-        threeofakind_combinations+=1
-    elif has_straight(final_cards):
-        straight_combinations+=1
-    elif has_flush(final_cards):
-        flush_combinations+=1
-    elif has_fullhouse(final_cards):
-        fullhouse_combinations+=1
-    elif has_fourofakind(final_cards):
-        fourofakind_combinations+=1
-    elif has_straightflush(final_cards):
-        sflush_combinations+=1
-    elif has_royalflush(final_cards):
-        rflush_combinations+=1
-
-odds_of_pair = (pair_combinations / total_combinations) * 100
-odds_of_twopair = (twopair_combinations / total_combinations) * 100
-odds_of_threeofkind = (threeofakind_combinations / total_combinations) * 100
-odds_of_straight = (straight_combinations / total_combinations) * 100
-odds_of_flush = (flush_combinations / total_combinations) * 100
-odds_of_fullhouse = (fullhouse_combinations / total_combinations) * 100
-odds_of_fourofakind = (fourofakind_combinations / total_combinations) * 100
-odds_of_sflush = (sflush_combinations / total_combinations) * 100
-odds_of_rflush = (rflush_combinations / total_combinations) * 100
-print("")
-print("odds of pair:", round(odds_of_pair,2),"%")
-print("odds of two pair:", round(odds_of_twopair,2), "%")
-print("odds of three of a kind:", round(odds_of_threeofkind,2),"%")
-print("odds of straight:", round(odds_of_straight,2),"%")
-print("odds of flush:", round(odds_of_flush,2),"%")
-print("odds of fullhouse:", round(odds_of_fullhouse,2),"%")
-print("odds of four of a kind:", round(odds_of_fourofakind,2), "%")
-print("odds of straight flush:", round(odds_of_sflush),"%")
-print("odds of royal flush:", round(odds_of_rflush,2), "%")
+final_cards=known_cards
+if has_pair(final_cards):
+    print("You have a pair!")
+if has_twopair(final_cards):
+    print("You have two pair!")
+if has_threeofakind(final_cards):
+    print("You have three of a kind!")
+if has_straight(final_cards):
+    print("You have a straight!")
+if has_flush(final_cards):
+    print("You have a flush!")
+if has_fullhouse(final_cards):
+    print("You have a fullhouse!")
+if has_fourofakind(final_cards):
+    print("You have four of a kind!")
+if has_straightflush(final_cards):
+    print("You have a straight flush!")
+if has_royalflush(final_cards):
+    print("You have a royal flush!")
