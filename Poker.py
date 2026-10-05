@@ -264,5 +264,3 @@ print("odds of fullhouse:", round(odds_of_fullhouse,2),"%")
 print("odds of four of a kind:", round(odds_of_fourofakind,2), "%")
 print("odds of straight flush:", round(odds_of_sflush),"%")
 print("odds of royal flush:", round(odds_of_rflush,2), "%")
-
-Change1
