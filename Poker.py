@@ -257,6 +257,157 @@ for turn, river in itertools.combinations(remaining_cards, 2):
         rflush_combinations += 1
 odds_of_rflush = (rflush_combinations / total_combinations) * 100
 
+def evaluate_hand(cards):
+    ranks = []
+    for card in cards:
+        rank = card[1:]
+        if rank == "A":
+            value = 14
+        elif rank == "K":
+            value = 13
+        elif rank == "Q":
+            value = 12
+        elif rank == "J":
+            value = 11
+        else:
+            value = int(rank)
+        ranks.append(value)
+    suits = [card[0] for card in cards]
+    rank_counts = Counter(ranks)
+    flush_suit = None
+    for suit in ["D", "S", "H", "C"]:
+        if suits.count(suit) >= 5:
+            flush_suit = suit
+            break
+    unique_ranks = sorted(set(ranks), reverse=True)
+    if 14 in unique_ranks:
+        unique_ranks.append(1)
+    straight_high = None
+    for i in range(len(unique_ranks) - 4):
+        five = unique_ranks[i:i+5]
+        if five[0] - five[4] == 4:
+            straight_high = five[0]
+            break
+    if flush_suit is not None:
+        suited_ranks = []
+        for card in cards:
+            if card[0] == flush_suit:
+                rank = card[1:]
+                if rank == "A":
+                    value = 14
+                elif rank == "K":
+                    value = 13
+                elif rank == "Q":
+                    value = 12
+                elif rank == "J":
+                    value = 11
+                else:
+                    value = int(rank)
+                suited_ranks.append(value)
+        suited_ranks = sorted(set(suited_ranks), reverse=True)
+        if 14 in suited_ranks:
+            suited_ranks.append(1)
+        for i in range(len(suited_ranks) - 4):
+            five = suited_ranks[i:i+5]
+            if five[0] - five[4] == 4:
+                high = five[0]
+                if high == 14:
+                    return (9, 14)
+                return (8, high)
+    four = sorted(
+        [rank for rank, count in rank_counts.items() if count == 4],
+        reverse=True)
+    if four:
+        four_rank = four[0]
+        kickers = sorted(
+            [rank for rank in ranks if rank != four_rank],
+            reverse=True)
+        return (7, four_rank, kickers[0])
+    triples = sorted(
+        [rank for rank, count in rank_counts.items() if count >= 3],
+        reverse=True)
+    if triples:
+        triple = triples[0]
+        pairs = sorted(
+            [rank for rank, count in rank_counts.items()
+            if count >= 2 and rank != triple ],
+            reverse=True   )
+        if len(triples) >= 2:
+            pairs.append(triples[1])
+        if pairs:
+            return (6, triple, max(pairs))
+    if flush_suit is not None:
+        flush_cards = []
+        for card in cards:
+            if card[0] == flush_suit:
+                rank = card[1:]
+                if rank == "A":
+                    value = 14
+                elif rank == "K":
+                    value = 13
+                elif rank == "Q":
+                    value = 12
+                elif rank == "J":
+                    value = 11
+                else:
+                    value = int(rank)
+                flush_cards.append(value)
+        flush_cards.sort(reverse=True)
+        return (5, *flush_cards[:5])
+    if straight_high is not None:
+        return(4, straight_high)
+    if triples:
+        triple = triples[0]
+        kickers = sorted(
+            [rank for rank in ranks if rank != triple],
+            reverse=True)
+        return (3, triple, *kickers[:2])
+    pairs = sorted(
+        [rank for rank, count in rank_counts.items() if count >= 2],
+        reverse=True)
+    if len(pairs) >= 2:
+        high_pair = pairs[0]
+        low_pair = pairs[1]
+        kickers = sorted(
+            [rank for rank in ranks
+            if rank != high_pair and rank != low_pair],
+            reverse=True)
+        return (2, high_pair, low_pair, kickers[0])
+    if len(pairs) == 1:
+        pair = pairs[0]
+        kickers = sorted(
+            [rank for rank in ranks if rank != pair],
+            reverse=True)
+        return (1, pair, *kickers[:3])
+    return (0, *sorted(ranks, reverse=True)[:5])
+
+def win_probability(known_cards, remaining_cards, simulations=100000):
+    wins = 0
+    ties = 0
+    losses = 0
+    your_cards = known_cards[:2]
+    board = known_cards[2:]
+    for _ in range(simulations):
+        opponent_cards = random.sample(remaining_cards, 2)
+        available = [
+            card for card in remaining_cards
+            if card not in opponent_cards]
+        cards_needed = 5 - len(board)
+        future_cards = random.sample(available, cards_needed)
+        final_board = board + future_cards
+        your_final_cards = your_cards + final_board
+        opponent_final_cards = opponent_cards + final_board
+        your_score = evaluate_hand(your_final_cards)
+        opponent_score = evaluate_hand(opponent_final_cards)
+        if your_score > opponent_score:
+            wins += 1
+        elif your_score == opponent_score:
+            ties += 1
+        else:
+            losses += 1
+    odds_of_winning = (wins / simulations) * 100
+    return odds_of_winning
+odds_of_winning = win_probability(known_cards, remaining_cards)
 print("")
 print("odds of pair:", round(odds_of_pair,2),"%")
 print("odds of two pair:", round(odds_of_twopair,2), "%")
@@ -267,10 +418,13 @@ print("odds of fullhouse:", round(odds_of_fullhouse,2),"%")
 print("odds of four of a kind:", round(odds_of_fourofakind,2), "%")
 print("odds of straight flush:", round(odds_of_sflush,2),"%")
 print("odds of royal flush:", round(odds_of_rflush,2), "%")
+print("odds of winning:", round(odds_of_winning), "%")
 
 tcard4 = input("Input the fourth card on the table:")
 all_cards.remove(tcard4)
 known_cards.append(tcard4)
+remaining_cards = [card for card in all_cards if card not in known_cards]
+odds_of_winning = win_probability(known_cards, remaining_cards)
 total_combinations=0
 pair_combinations=0
 twopair_combinations=0
@@ -281,7 +435,6 @@ fullhouse_combinations=0
 fourofakind_combinations=0
 sflush_combinations=0
 rflush_combinations=0
-
 for river in all_cards:
     total_combinations +=1
     final_cards = known_cards + [river]
@@ -303,7 +456,6 @@ for river in all_cards:
         sflush_combinations+=1
     if has_royalflush(final_cards):
         rflush_combinations+=1
-
 odds_of_pair = (pair_combinations / total_combinations) * 100
 odds_of_twopair = (twopair_combinations / total_combinations) * 100
 odds_of_threeofakind = (threeofakind_combinations / total_combinations) * 100
@@ -323,10 +475,13 @@ print("odds of fullhouse:", round(odds_of_fullhouse,2),"%")
 print("odds of four of a kind:", round(odds_of_fourofakind,2), "%")
 print("odds of straight flush:", round(odds_of_sflush,2),"%")
 print("odds of royal flush:", round(odds_of_rflush,2), "%")
+print("odds of winning after river:", round(odds_of_winning, 2), "%")
 
 tcard5 = input("Input the fifth card on the table:")
 all_cards.remove(tcard5)
 known_cards.append(tcard5)
+remaining_cards = [card for card in all_cards if card not in known_cards]
+odds_of_winning = win_probability(known_cards, remaining_cards)
 final_cards=known_cards
 if has_pair(final_cards):
     print("You have a pair!")
@@ -346,3 +501,4 @@ if has_straightflush(final_cards):
     print("You have a straight flush!")
 if has_royalflush(final_cards):
     print("You have a royal flush!")
+print("odds of winning:", round(odds_of_winning, 2), "%")
