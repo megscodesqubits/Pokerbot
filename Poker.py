@@ -1,6 +1,8 @@
 import itertools
 from collections import Counter
 import random
+import customtkinter as ctk
+from tkinter import messagebox
 
 all_cards = ["DA", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "DJ", "DQ", "DK", 
              "SA", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "SJ", "SQ", "SK", 
