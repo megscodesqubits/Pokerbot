@@ -25,7 +25,6 @@ card2 = input("Input the second card")
 card2suit = card2[0]
 card2rank = card2[1:]
 all_cards.remove(card2)
-
 tcard1 = input("Input the first card on the table")
 tcard1suit = tcard1[0]
 tcard1rank = tcard1[1:]
